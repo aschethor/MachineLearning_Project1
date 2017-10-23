@@ -38,3 +38,55 @@ def ridge_regression(y, tx, lambda_):
     weights = np.dot(np.dot(tx_inv,tx.transpose()),y)
     return compute_loss(y,tx,weights),weights
 
+def compute_gradient(y, tx, w):
+    """Compute the gradient."""
+    N = len(y)
+    return np.dot(tx.transpose(),np.dot(tx,w)-y)/N
+
+def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+    """Gradient descent algorithm."""
+    # Define parameters to store w and loss
+    ws = [initial_w]
+    losses = []
+    w = initial_w
+    for n_iter in range(max_iters):
+        loss = compute_loss(y,tx,w)
+        gradient = compute_gradient(y,tx,w)
+        w = w - gamma*gradient
+        # store w and loss
+        ws.append(w)
+        losses.append(loss)
+        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+
+    return losses, ws
+
+def compute_stoch_gradient(y, tx, w):
+    """Compute a stochastic gradient from just few examples n and their corresponding y_n labels."""
+    N = len(y)
+    return np.dot(tx.transpose(),np.dot(tx,w)-y)/N
+
+
+from random import randint
+
+def least_squares_SGD(
+        y, tx, initial_w, max_iters, gamma):
+    """Stochastic gradient descent algorithm."""
+    # Define parameters to store w and loss
+    ws = [initial_w]
+    losses = []
+    w = initial_w
+    N = len(y)
+    batch_size = 10
+    for n_iter in range(max_iters):
+        i = [randint(0,N) for p in range(batch_size)]
+        loss = compute_loss(y[i],tx[i],w)
+        gradient = compute_gradient(y[i],tx[i],w)
+        w = w - gamma*gradient
+        # store w and loss
+        ws.append(w)
+        losses.append(loss)
+        print("Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}".format(
+              bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1]))
+
+    return losses, ws
