@@ -23,6 +23,7 @@ def generate_tx(X):
     return tx
 
 #don't use this function for the whole dataset!!! ;)
+#don't use it at all -> does terribly overfit ;)
 def generate_tx_cross(X):
     tx = np.ones([X.shape[0],1])
     tx = np.c_[tx,X]
@@ -34,10 +35,10 @@ def generate_tx_cross(X):
 def train_least_squares(tx,Y):
     size = tx.shape[0]
     batch_size = 1000
-    final_w = np.zeros(tx.shape[1])
+    final_w = np.zeros([tx.shape[1],1])
     for i in range(size/batch_size):
         loss,w = utils.least_squares(Y[(i*batch_size):((i+1)*batch_size)],tx[(i*batch_size):((i+1)*batch_size),:])
-        final_w += w
+        final_w = final_w+w
     return final_w*batch_size/size
 
 def predict(tx,w):
@@ -49,15 +50,7 @@ def accuracy(tx,Y,w):
 tx=generate_tx(X)
 
 print("calculating least squares")
+w = train_least_squares(tx,Y)
+accuracy(tx,Y,w)
 
-loss,w = utils.least_squares(Y[:10000],tx[:10000,:])
-Ypred = np.round(np.dot(tx,w))
-accuracy = float(np.sum(Y==Ypred))/250000
-
-print("calculating logistic regression")
-
-w1,loss1=utils.logistic_regression(Y[:500],tx[:500,:],np.zeros([tx.shape[1],1]),1000,0.1)
-Ypred2 = np.dot(tx,w1)
-Ypred2 = (np.sign(Ypred2-0.5)+1)/2
-accuracy2 = float(np.sum(Y==Ypred2))/250000
 blubb=0
